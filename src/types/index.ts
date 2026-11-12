@@ -685,6 +685,17 @@ export interface SalesInvoice {
   assignedToId?: string;
   tags?: string[];
   salesOrderId?: string;
+  reference?: string;
+  customerPoNo?: string;
+  shipmentReference?: string;
+  countryOfOrigin?: string;
+  countryOfDestination?: string;
+  portOfLoading?: string;
+  portOfDischarge?: string;
+  incoterms?: string;
+  grossWeight?: number;
+  netWeight?: number;
+  packageCount?: number;
   date: string;
   dueDate?: string;
   status: InvoiceStatus;

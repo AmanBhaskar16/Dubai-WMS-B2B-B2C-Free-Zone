@@ -218,6 +218,28 @@ export const navItems: NavItem[] = [
     ],
   },
 
+  {
+    label: 'Invoices',
+    icon: Receipt,
+    children: [
+      { label: 'Sales Invoices', href: '/invoicing/sales-invoices', icon: FileText },
+      { label: 'Payments', href: '/invoicing/payments', icon: CreditCard },
+      { label: 'Delivery Notes', href: '/invoicing/delivery-notes', icon: Truck },
+      { label: 'Credit Notes', href: '/invoicing/credit-notes', icon: FileMinus },
+      { label: 'Payment Entries', href: '/invoicing/payment-entries', icon: HandCoins },
+      { label: 'Invoice Ledger', href: '/invoicing/ledger', icon: ScrollText },
+      { label: 'Aging Report', href: '/invoicing/reports/aging', icon: BarChart3 },
+      { label: 'Outstanding Invoices', href: '/invoicing/reports/outstanding', icon: FileClock },
+      { label: 'Revenue by Period', href: '/invoicing/reports/revenue-by-period', icon: ChartColumnIncreasing },
+      { label: 'Revenue by Customer', href: '/invoicing/reports/revenue-by-customer', icon: Users },
+      { label: 'Revenue by Item', href: '/invoicing/reports/revenue-by-item', icon: Package },
+      { label: 'Tax Templates', href: '/invoicing/tax-templates', icon: Percent },
+      { label: 'Print Formats', href: '/invoicing/print-formats', icon: Printer },
+      { label: 'Recurring Invoices', href: '/invoicing/subscriptions', icon: Repeat },
+      { label: 'Invoice Audit Log', href: '/invoicing/audit-log', icon: History },
+    ],
+  },
+
   // =========================================================
   // HR
   // =========================================================

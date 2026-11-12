@@ -20,6 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const isSubdomainActive = isSubdomainEnabled();
 
+
   useEffect(() => {
     if (!isLoading && !isWorkspaceLoading) {
       if (!user || !token) {

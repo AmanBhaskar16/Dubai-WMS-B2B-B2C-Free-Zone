@@ -74,7 +74,7 @@ export default function SalesInvoiceDetailPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [printFormats, setPrintFormats] = useState<any[]>([]);
   const [printFormatId, setPrintFormatId] = useState('');
-  const [form, setForm] = useState({ customerId: '', date: '', dueDate: '', notes: '', terms: '', currency: 'USD' });
+  const [form, setForm] = useState({ customerId: '', date: '', dueDate: '', notes: '', terms: '', currency: 'USD', reference: '', customerPoNo: '', shipmentReference: '', countryOfOrigin: '', countryOfDestination: '', portOfLoading: '', portOfDischarge: '', incoterms: '', grossWeight: '', netWeight: '', packageCount: '' });
   const [rows, setRows] = useState<LineItemRow[]>([]);
   const [payment, setPayment] = useState({ amount: '', date: new Date().toISOString().slice(0, 10), method: 'BANK_TRANSFER' as PaymentMethod, reference: '', notes: '' });
 
@@ -95,6 +95,17 @@ export default function SalesInvoiceDetailPage() {
         notes: next.notes || '',
         terms: next.terms || '',
         currency: next.currency || 'INR',
+        reference: (next as any).reference || '',
+        customerPoNo: (next as any).customerPoNo || '',
+        shipmentReference: (next as any).shipmentReference || '',
+        countryOfOrigin: (next as any).countryOfOrigin || '',
+        countryOfDestination: (next as any).countryOfDestination || '',
+        portOfLoading: (next as any).portOfLoading || '',
+        portOfDischarge: (next as any).portOfDischarge || '',
+        incoterms: (next as any).incoterms || '',
+        grossWeight: (next as any).grossWeight == null ? '' : String((next as any).grossWeight),
+        netWeight: (next as any).netWeight == null ? '' : String((next as any).netWeight),
+        packageCount: (next as any).packageCount == null ? '' : String((next as any).packageCount),
       });
       setRows(toRows(next));
       setPayment(prev => ({ ...prev, amount: String(Math.max(invoiceOutstanding(next), 0)) }));
@@ -122,6 +133,9 @@ export default function SalesInvoiceDetailPage() {
     try {
       const payload = {
         ...form,
+        grossWeight: form.grossWeight ? Number(form.grossWeight) : undefined,
+        netWeight: form.netWeight ? Number(form.netWeight) : undefined,
+        packageCount: form.packageCount ? Number(form.packageCount) : undefined,
         items: rows.filter(row => row.productId || row.itemCode || row.description).map(row => ({
           productId: row.productId,
           itemCode: row.itemCode,
@@ -299,6 +313,29 @@ export default function SalesInvoiceDetailPage() {
 
           <section className="rounded-md border border-[#dfe3e8] bg-white">
             <div className="flex items-center justify-between border-b border-[#edf0f2] px-4 py-3">
+              <h2 className="text-sm font-semibold text-[#1f2937]">Shipment and Export Details</h2>
+              <span className="text-xs text-[#8a929d]">{readOnly ? 'Invoice reference' : 'Editable while Draft'}</span>
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
+                <Field label="Invoice Number" value={invoice.invoiceNo} readOnly><Input value={invoice.invoiceNo} disabled /></Field>
+                <InvoiceField label="Shipment / Booking Reference" value={form.shipmentReference} readOnly={readOnly} onChange={(shipmentReference) => setForm(prev => ({ ...prev, shipmentReference }))} />
+                <InvoiceField label="Customer PO No." value={form.customerPoNo} readOnly={readOnly} onChange={(customerPoNo) => setForm(prev => ({ ...prev, customerPoNo }))} />
+                <InvoiceField label="Other Reference" value={form.reference} readOnly={readOnly} onChange={(reference) => setForm(prev => ({ ...prev, reference }))} />
+                <InvoiceField label="Country of Origin" value={form.countryOfOrigin} readOnly={readOnly} onChange={(countryOfOrigin) => setForm(prev => ({ ...prev, countryOfOrigin }))} />
+                <InvoiceField label="Country of Destination" value={form.countryOfDestination} readOnly={readOnly} onChange={(countryOfDestination) => setForm(prev => ({ ...prev, countryOfDestination }))} />
+                <InvoiceField label="Port of Loading" value={form.portOfLoading} readOnly={readOnly} onChange={(portOfLoading) => setForm(prev => ({ ...prev, portOfLoading }))} />
+                <InvoiceField label="Port of Discharge" value={form.portOfDischarge} readOnly={readOnly} onChange={(portOfDischarge) => setForm(prev => ({ ...prev, portOfDischarge }))} />
+                <InvoiceField label="Incoterms" value={form.incoterms} readOnly={readOnly} onChange={(incoterms) => setForm(prev => ({ ...prev, incoterms }))} />
+                <InvoiceField label="Packages / Cartons" value={form.packageCount} type="number" readOnly={readOnly} onChange={(packageCount) => setForm(prev => ({ ...prev, packageCount }))} />
+                <InvoiceField label="Gross Weight (kg)" value={form.grossWeight} type="number" readOnly={readOnly} onChange={(grossWeight) => setForm(prev => ({ ...prev, grossWeight }))} />
+                <InvoiceField label="Net Weight (kg)" value={form.netWeight} type="number" readOnly={readOnly} onChange={(netWeight) => setForm(prev => ({ ...prev, netWeight }))} />
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-md border border-[#dfe3e8] bg-white">
+            <div className="flex items-center justify-between border-b border-[#edf0f2] px-4 py-3">
               <h2 className="text-sm font-semibold text-[#1f2937]">Items</h2>
               <span className="text-xs text-[#8a929d]">Spreadsheet grid</span>
             </div>
@@ -431,6 +468,14 @@ function Field({ label, value, readOnly, children }: { label: string; value: str
       <Label>{label}</Label>
       {readOnly ? <div className="min-h-8 rounded-md border border-[#e5e2dc] bg-[#f8faf9] px-2.5 py-1.5 text-sm text-[#4b5563]">{value}</div> : children}
     </div>
+  );
+}
+
+function InvoiceField({ label, value, readOnly, onChange, type = 'text' }: { label: string; value: string; readOnly: boolean; onChange: (value: string) => void; type?: string }) {
+  return (
+    <Field label={label} value={value || '-'} readOnly={readOnly}>
+      <Input type={type} min={type === 'number' ? '0' : undefined} step={type === 'number' ? '0.01' : undefined} value={value} onChange={event => onChange(event.target.value)} />
+    </Field>
   );
 }
 

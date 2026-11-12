@@ -16,6 +16,8 @@
 # next.js
 /.next/
 /out/
+/data/invoice-demo.json
+/data/invoice-demo.json.*.tmp
 
 # production
 /build

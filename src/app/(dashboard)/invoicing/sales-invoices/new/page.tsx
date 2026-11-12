@@ -32,6 +32,17 @@ export default function NewSalesInvoicePage() {
     date: new Date().toISOString().slice(0, 10),
     dueDate: '',
     currency: 'INR',
+    reference: '',
+    customerPoNo: '',
+    shipmentReference: '',
+    countryOfOrigin: 'United Arab Emirates',
+    countryOfDestination: 'United States',
+    portOfLoading: 'Jebel Ali, UAE',
+    portOfDischarge: '',
+    incoterms: '',
+    grossWeight: '',
+    netWeight: '',
+    packageCount: '',
     notes: '',
     terms: '',
   });
@@ -85,7 +96,13 @@ export default function NewSalesInvoicePage() {
 
     setIsSaving(true);
     try {
-      const res = await api.post('/invoices', { ...form, items });
+      const res = await api.post('/invoices', {
+        ...form,
+        grossWeight: form.grossWeight ? Number(form.grossWeight) : undefined,
+        netWeight: form.netWeight ? Number(form.netWeight) : undefined,
+        packageCount: form.packageCount ? Number(form.packageCount) : undefined,
+        items,
+      });
       const invoice = res.data?.data;
       showApiSuccess('Draft invoice created successfully');
       router.push(`/invoicing/sales-invoices/${invoice.id}`);
@@ -107,7 +124,7 @@ export default function NewSalesInvoicePage() {
             </Link>
           </Button>
           <h1 className="text-xl font-semibold text-[#1f2937]">New Sales Invoice</h1>
-          <p className="text-sm text-[#6b7280]">Create a draft invoice. Totals are confirmed by the backend after save.</p>
+          <p className="text-sm text-[#6b7280]">Create a customer invoice with shipment and export details. Totals are confirmed by the backend after save.</p>
         </div>
         <Button onClick={createInvoice} disabled={isSaving || customers.length === 0}>
           <Save className="mr-2 h-4 w-4" />
@@ -214,6 +231,27 @@ export default function NewSalesInvoicePage() {
 
       <Card>
         <CardHeader>
+          <CardTitle>Shipment & Export Details</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <InvoiceField label="Shipment / Booking Reference" value={form.shipmentReference} placeholder="Shipment or booking reference" onChange={(shipmentReference) => setForm((prev) => ({ ...prev, shipmentReference }))} />
+            <InvoiceField label="Customer PO No." value={form.customerPoNo} placeholder="Customer purchase order" onChange={(customerPoNo) => setForm((prev) => ({ ...prev, customerPoNo }))} />
+            <InvoiceField label="Other Reference" value={form.reference} placeholder="Reference number" onChange={(reference) => setForm((prev) => ({ ...prev, reference }))} />
+            <InvoiceField label="Country of Origin" value={form.countryOfOrigin} placeholder="Country of origin" onChange={(countryOfOrigin) => setForm((prev) => ({ ...prev, countryOfOrigin }))} />
+            <InvoiceField label="Country of Destination" value={form.countryOfDestination} placeholder="Destination country" onChange={(countryOfDestination) => setForm((prev) => ({ ...prev, countryOfDestination }))} />
+            <InvoiceField label="Port of Loading" value={form.portOfLoading} placeholder="Port of loading" onChange={(portOfLoading) => setForm((prev) => ({ ...prev, portOfLoading }))} />
+            <InvoiceField label="Port of Discharge" value={form.portOfDischarge} placeholder="Port of discharge" onChange={(portOfDischarge) => setForm((prev) => ({ ...prev, portOfDischarge }))} />
+            <InvoiceField label="Incoterms" value={form.incoterms} placeholder="e.g. FOB, CIF, EXW" onChange={(incoterms) => setForm((prev) => ({ ...prev, incoterms }))} />
+            <InvoiceField label="Packages / Cartons" value={form.packageCount} type="number" placeholder="Number of packages" onChange={(packageCount) => setForm((prev) => ({ ...prev, packageCount }))} />
+            <InvoiceField label="Gross Weight (kg)" value={form.grossWeight} type="number" placeholder="Gross weight" onChange={(grossWeight) => setForm((prev) => ({ ...prev, grossWeight }))} />
+            <InvoiceField label="Net Weight (kg)" value={form.netWeight} type="number" placeholder="Net weight" onChange={(netWeight) => setForm((prev) => ({ ...prev, netWeight }))} />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Line Items</CardTitle>
         </CardHeader>
         <CardContent>
@@ -225,6 +263,15 @@ export default function NewSalesInvoicePage() {
           </div>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function InvoiceField({ label, value, onChange, placeholder, type = 'text' }: { label: string; value: string; onChange: (value: string) => void; placeholder?: string; type?: string }) {
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <Input type={type} min={type === 'number' ? '0' : undefined} step={type === 'number' ? '0.01' : undefined} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />
     </div>
   );
 }

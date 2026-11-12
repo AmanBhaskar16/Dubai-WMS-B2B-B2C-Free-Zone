@@ -108,10 +108,11 @@ export function showApiError(err: any, fallback = 'Operation failed'): string {
   if (err?.response?.status === 401) {
     return '';
   }
-  // Suppress network error toasts when backend is offline (Presentation / UI Dev Mode)
-  if (err?.code === 'ERR_NETWORK' || err?.message === 'Network Error' || !err?.response) {
-    console.warn('[Demo/Presentation Mode] Backend offline, network error toast suppressed.');
-    return '';
+  // Make backend availability visible to users; failed mutations otherwise look like no-op clicks.
+  if (err?.code === 'ERR_NETWORK' || err?.message === 'Network Error') {
+    const message = 'The API server is unavailable. Start the app backend and try again.';
+    toast.error(message);
+    return message;
   }
   const message = getApiErrorMessage(err, fallback);
   toast.error(message);

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { extractSubdomain } from './subdomain';
 
-const configuredApiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1').replace(/\/$/, '');
+const configuredApiUrl = (process.env.NEXT_PUBLIC_API_URL || '/api/v1').replace(/\/$/, '');
 // Orus exposes its canonical API below /api/v1. Normalize the older /api
 // deployment value so newer platform routes (including Audit Trail) resolve.
 const apiBaseUrl = configuredApiUrl.endsWith('/api') ? `${configuredApiUrl}/v1` : configuredApiUrl;
@@ -53,22 +53,9 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
-    // If backend is unreachable during frontend UI presentation/dev, return empty mock data for GET requests
-    const isNetworkError = err.code === 'ERR_NETWORK' || err.message === 'Network Error' || !err.response;
-    if (isNetworkError && err.config?.method?.toLowerCase() === 'get') {
-      return Promise.resolve({
-        data: { success: true, data: [], items: [] },
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: err.config,
-      });
-    }
-
     const requestUrl = String(err.config?.url || '');
     const isAuthRequest = ['/auth/login', '/auth/register', '/auth/refresh', '/auth/check-slug', '/auth/workspace']
       .some((path) => requestUrl.includes(path));
-
     if (err.response?.status === 401 && !isAuthRequest) {
       const sentToken = Boolean(err.config?.headers?.Authorization);
       if (sentToken && !err.config?._retried) {
